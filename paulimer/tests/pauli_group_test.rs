@@ -1066,13 +1066,13 @@ mod factorization_tests {
         assert!(is_symplectic(&symplectic_basis1));
     }
 
-    /// Returns a `SparsePauli` that is guaranteed not to be in the given group.
-    ///
-    /// For trivial groups (no nontrivial generators), returns X on qubit 0.
-    fn non_member_of(group: &PauliGroup) -> SparsePauli {
+    /// Returns a `SparsePauli` that is guaranteed not to be in the given group,
+    /// or `None` if the group is full rank over its support (i.e., every Pauli
+    /// on those qubits is already a member).
+    fn non_member_of(group: &PauliGroup) -> Option<SparsePauli> {
         let rank = group.binary_rank();
         if rank == 0 {
-            return SparsePauli::from_str("X").unwrap();
+            return Some(SparsePauli::from_str("X").unwrap());
         }
 
         let support = group.support();
@@ -1080,10 +1080,7 @@ mod factorization_tests {
         let matrix = as_bitmatrix(generators, support);
         let full = complete_to_full_rank_row_basis(&matrix).expect("standard generators must be linearly independent");
 
-        as_sparse_paulis(&full, support)
-            .into_iter()
-            .nth(rank)
-            .expect("completion must produce at least one extra element")
+        as_sparse_paulis(&full, support).into_iter().nth(rank)
     }
 
     proptest! {
@@ -1129,6 +1126,8 @@ mod factorization_tests {
         #[test]
         fn test_factorization_indexes_of_non_member(group in small_pauli_group()) {
             let non_member = non_member_of(&group);
+            prop_assume!(non_member.is_some(), "group is full rank, no non-member exists");
+            let non_member = non_member.unwrap();
             let result = group.factorization_indexes_of(&non_member);
             prop_assert!(
                 result.is_none(),
