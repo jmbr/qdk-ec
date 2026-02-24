@@ -174,7 +174,7 @@ impl PauliGroup {
     }
 
     /// Returns a factorization of the given element in terms of generators of the group.
-    /// The product of each item in the return value must equal the original element.
+    /// The product of all items in the return value equals the original element.
     /// Returns None if no factorization exists (i.e., the element is not in the group).
     ///
     /// # Panics
@@ -190,7 +190,7 @@ impl PauliGroup {
 
     /// Returns factorizations of the given elements in terms of generators of the group.
     pub fn factorizations_of(&self, elements: &[SparsePauli]) -> Vec<Option<Vec<SparsePauli>>> {
-        self.factorizations_indexes_of(elements)
+        self.indexed_factorizations_of(elements)
             .into_iter()
             .map(|o| {
                 o.map(|(indexes, phase)| {
@@ -211,9 +211,9 @@ impl PauliGroup {
     /// # Panics
     ///
     /// This function should not panic in normal use. The internal `unwrap()` is safe because
-    /// `factorizations_indexes_of` always returns exactly one result per input element.
-    pub fn factorization_indexes_of(&self, element: &SparsePauli) -> Option<(Vec<usize>, Exponent)> {
-        self.factorizations_indexes_of(std::slice::from_ref(element))
+    /// `indexed_factorizations_of` always returns exactly one result per input element.
+    pub fn indexed_factorization_of(&self, element: &SparsePauli) -> Option<(Vec<usize>, Exponent)> {
+        self.indexed_factorizations_of(std::slice::from_ref(element))
             .into_iter()
             .next()
             .unwrap()
@@ -226,7 +226,7 @@ impl PauliGroup {
     /// This function should not panic in normal use. The internal `unwrap()` is safe because
     /// the filtering and reconstruction logic ensures that each input element corresponds to
     /// exactly one position in the iterator.
-    pub fn factorizations_indexes_of(&self, elements: &[SparsePauli]) -> Vec<Option<(Vec<usize>, Exponent)>> {
+    pub fn indexed_factorizations_of(&self, elements: &[SparsePauli]) -> Vec<Option<(Vec<usize>, Exponent)>> {
         let group_support = self.support();
         let is_supported = |e: &SparsePauli| {
             e.support()

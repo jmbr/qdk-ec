@@ -370,12 +370,12 @@ def test_factorization_consistency():
     assert batch_result[0] == single_result
 
 
-def test_factorization_indexes_of_interface():
+def test_indexed_factorization_of_interface():
     generators = [SparsePauli.x(0), SparsePauli.z(1)]
     group = PauliGroup(generators)
 
     # Test element in group returns tuple of (indexes, phase)
-    result = group.factorization_indexes_of(SparsePauli.x(0))
+    result = group.indexed_factorization_of(SparsePauli.x(0))
     assert result is not None
     indexes, phase = result
     assert isinstance(indexes, list)
@@ -383,21 +383,21 @@ def test_factorization_indexes_of_interface():
     assert all(isinstance(i, int) for i in indexes)
 
     # Test element not in group returns None
-    result = group.factorization_indexes_of(SparsePauli.y(0))
+    result = group.indexed_factorization_of(SparsePauli.y(0))
     assert result is None
 
 
-def test_factorizations_indexes_of_interface():
+def test_indexed_factorizations_of_interface():
     generators = [SparsePauli.x(0), SparsePauli.z(1)]
     group = PauliGroup(generators)
 
     # Test empty input
-    results = group.factorizations_indexes_of([])
+    results = group.indexed_factorizations_of([])
     assert isinstance(results, list)
     assert len(results) == 0
 
     # Test single element
-    results = group.factorizations_indexes_of([SparsePauli.x(0)])
+    results = group.indexed_factorizations_of([SparsePauli.x(0)])
     assert isinstance(results, list)
     assert len(results) == 1
     assert results[0] is not None
@@ -407,36 +407,36 @@ def test_factorizations_indexes_of_interface():
 
     # Test multiple elements (mix of members and non-members)
     elements = [SparsePauli.x(0), SparsePauli.z(1), SparsePauli.y(0)]
-    results = group.factorizations_indexes_of(elements)
+    results = group.indexed_factorizations_of(elements)
     assert isinstance(results, list)
     assert len(results) == len(elements)
     for r in results:
         assert r is None or (isinstance(r, tuple) and len(r) == 2)
 
 
-def test_factorization_indexes_consistency():
+def test_indexed_factorization_consistency():
     generators = [SparsePauli.x(0), SparsePauli.z(1)]
     group = PauliGroup(generators)
 
     element = SparsePauli.x(0)
 
     # Single
-    single_result = group.factorization_indexes_of(element)
+    single_result = group.indexed_factorization_of(element)
 
     # Batch
-    batch_result = group.factorizations_indexes_of([element])
+    batch_result = group.indexed_factorizations_of([element])
 
     assert len(batch_result) == 1
     assert batch_result[0] == single_result
 
 
-def test_factorization_indexes_indexes_are_valid():
+def test_indexed_factorization_indexes_are_valid():
     """Indexes should refer to valid positions in generators."""
     generators = [SparsePauli.x(0), SparsePauli.z(1)]
     group = PauliGroup(generators)
     gen_list = group.generators
 
-    result = group.factorization_indexes_of(SparsePauli.x(0))
+    result = group.indexed_factorization_of(SparsePauli.x(0))
     assert result is not None
     indexes, phase = result
     for idx in indexes:

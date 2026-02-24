@@ -1085,7 +1085,7 @@ mod factorization_tests {
 
     proptest! {
         #[test]
-        fn test_factorization_indexes_of_generator_product(
+        fn test_indexed_factorization_of_generator_product(
             group in small_pauli_group(),
             subset_index in any::<usize>(),
         ) {
@@ -1104,7 +1104,7 @@ mod factorization_tests {
             );
 
             let (indexes, phase) = group
-                .factorization_indexes_of(&element)
+                .indexed_factorization_of(&element)
                 .unwrap_or_else(|| panic!("expected Some for product of generators"));
 
             // Each index must be valid.
@@ -1124,11 +1124,11 @@ mod factorization_tests {
         }
 
         #[test]
-        fn test_factorization_indexes_of_non_member(group in small_pauli_group()) {
+        fn test_indexed_factorization_of_non_member(group in small_pauli_group()) {
             let non_member = non_member_of(&group);
             prop_assume!(non_member.is_some(), "group is full rank, no non-member exists");
             let non_member = non_member.unwrap();
-            let result = group.factorization_indexes_of(&non_member);
+            let result = group.indexed_factorization_of(&non_member);
             prop_assert!(
                 result.is_none(),
                 "expected None for non-member {:?}, got {:?}",
